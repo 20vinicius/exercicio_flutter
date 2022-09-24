@@ -1,0 +1,138 @@
+import 'package:flutter/material.dart';
+
+void main() async {
+  runApp(MaterialApp(
+    home: const MyWidget(),
+    theme: ThemeData(
+        hintColor: Colors.blue,
+        primaryColor: Colors.white,
+        inputDecorationTheme: const InputDecorationTheme(
+            enabledBorder:
+                OutlineInputBorder(borderSide: BorderSide(color: Colors.black)),
+            focusedBorder:
+                OutlineInputBorder(borderSide: BorderSide(color: Colors.amber)),
+            hintStyle: TextStyle(color: Colors.lightBlueAccent))),
+  ));
+}
+
+class MyWidget extends StatefulWidget {
+  const MyWidget({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  State<MyWidget> createState() => _MyWidgetState();
+}
+
+class _MyWidgetState extends State<MyWidget> {
+  final anoController = TextEditingController();
+  final mesController = TextEditingController();
+  final diaController = TextEditingController();
+
+  String _mensagem = "";
+  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  int ano = 0;
+  int mes = 0;
+  int dia = 0;
+
+  _diaMesAnoparaDias() {
+    setState(() {
+      ano = int.parse(anoController.text);
+      mes = int.parse(mesController.text);
+      dia = int.parse(diaController.text);
+
+      int dias = ano * 365 + mes * 30 + ano;
+      _mensagem = "Você tem ${dias.toString()} dias!";
+      anoController.clear();
+      mesController.clear();
+      diaController.clear();
+    });
+  }
+
+  void _limparCampos() {
+    anoController.clear();
+    mesController.clear();
+    diaController.clear();
+    setState(() {
+      _mensagem = "informe seus dados";
+      _formKey = GlobalKey<FormState>();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: const Text("ano/mes/dias para anos"),
+        backgroundColor: Colors.blue[700],
+        centerTitle: true,
+        actions: <Widget>[
+          IconButton(onPressed: _limparCampos, icon: const Icon(Icons.refresh))
+        ],
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(10),
+        child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Icon(
+                  Icons.date_range,
+                  size: 150,
+                  color: Colors.blueAccent,
+                ), // Icon
+                construirTextField("Ano", "Ano: ", anoController, "Erro"),
+                const Divider(),
+                construirTextField("Mês", "Mês:", mesController, "Erro"),
+                const Divider(),
+                construirTextField("Dia", "Dia: ", diaController, "Erro"),
+                Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: ElevatedButton(
+                      onPressed: () {
+                        _diaMesAnoparaDias();
+                      },
+                      child: const Text(
+                        "Converter",
+                        style: TextStyle(fontSize: 30, color: Colors.amber),
+                      )),
+                ),
+                Center(
+                  child: Text(
+                    _mensagem,
+                    style: const TextStyle(
+                        color: Colors.red,
+                        fontWeight: FontWeight.bold,
+                        fontStyle: FontStyle.italic,
+                        fontSize: 30), // TextStyle
+                  ),
+                )
+              ],
+            )),
+      ),
+    );
+  }
+}
+
+Widget construirTextField(String texto, String prefixo, TextEditingController c,
+    String mensagemErro) {
+  return TextFormField(
+      validator: (value) {
+        if (value!.isEmpty) {
+          return mensagemErro;
+        } else {
+          return null;
+        }
+      },
+      controller: c,
+      decoration: InputDecoration(
+          labelText: texto,
+          labelStyle: const TextStyle(color: Colors.blue),
+          border: const OutlineInputBorder(),
+          prefixText: prefixo), // InputDecoration
+      style: const TextStyle(
+        color: Colors.black,
+      ));
+}
